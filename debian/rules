@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+UPSTREAM_GIT := https://github.com/kgrandis/nose-exclude
+include /usr/share/openstack-pkg-tools/pkgos.make
+
+export PYBUILD_NAME=nose-exclude
+
+%:
+	dh $@ --with python3 --buildsystem=pybuild
+
+override_dh_auto_test:
+ifeq (,$(findstring nocheck, $(DEB_BUILD_OPTIONS)))
+	set -e ; set -x ; for i in $(PYTHON3S) ; do \
+		PYMAJOR=`echo $$i | cut -d'.' -f1` ; \
+		echo "===> Testing with python$$i (python$$PYMAJOR)" ; \
+		python$$i setup.py test ; \
+	done
+endif
